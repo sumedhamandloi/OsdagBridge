@@ -1,0 +1,4 @@
+FOSSEE IIT BOMBAY - SCREENING ASSIGNMENT TECHNICAL REPORT
+=========================================================
+Title: Parametric 3D CAD Modeling of Bridge Substructure and IFC Workflow Integration
+Live Google Document Link: https://docs.google.com/document/d/17vBZN5IohWHVWvcs1RoEHBPne3BkyIvVWuaAx2ROdVE/edit
