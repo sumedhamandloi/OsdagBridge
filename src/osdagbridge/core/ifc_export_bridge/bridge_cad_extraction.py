@@ -125,8 +125,129 @@ class PlateGirderIFCExtractor:
             "cross_bracings": self._extract_cross_bracings(n_girders, spacing),
             "deck_slab": self._extract_deck_slab(total_width),
             "crash_barriers": self._extract_safety_components(total_width, actual_base_width, actual_railing_width),
-            "supports": self._extract_supports(n_girders, spacing)
+            "supports": self._extract_supports(n_girders, spacing),
+            "substructure": self._extract_substructure()
         }
+
+    def _extract_substructure(self):
+        """Extracts Pier Cap, Pier, Pile Cap, Piles, and Reinforcement parametrically for IFC."""
+        items = []
+        d = getattr(self.cad, "girder_section_d", 1500.0)
+        tf_b = getattr(self.cad, "girder_section_tf_b", 25.0)
+        z_contact = -d / 2.0 - tf_b
+
+        sub_x = 0.0
+        sub_y = 0.0
+
+        # 1. Pier Cap (Hammerhead / Trapezoidal)
+        pier_cap_top_w = getattr(self.cad, "pier_cap_top_width", 3000.0)
+        pier_cap_bot_w = 1200.0
+        pier_cap_depth = 600.0
+        pier_cap_len = getattr(self.cad, "pier_cap_length", 1200.0)
+
+        items.append(ExtractedObject(
+            "SubstructurePierCap",
+            ifc_name="Pier_Cap_01",
+            top_width=pier_cap_top_w,
+            bottom_width=pier_cap_bot_w,
+            depth=pier_cap_depth,
+            length=pier_cap_len,
+            center_x=sub_x,
+            center_y=sub_y,
+            top_z=z_contact
+        ))
+
+        # 2. Pier Column (Circular)
+        pier_dia = 800.0
+        pier_h = 3000.0
+        z_pier_top = z_contact - pier_cap_depth
+
+        items.append(ExtractedObject(
+            "SubstructurePier",
+            ifc_name="Pier_Column_01",
+            diameter=pier_dia,
+            height=pier_h,
+            center_x=sub_x,
+            center_y=sub_y,
+            top_z=z_pier_top
+        ))
+
+        # 3. Pile Cap (Rectangular Prism)
+        pile_cap_len = 2200.0
+        pile_cap_w = 1200.0
+        pile_cap_depth = 600.0
+        z_pile_cap_top = z_pier_top - pier_h
+
+        items.append(ExtractedObject(
+            "SubstructurePileCap",
+            ifc_name="Pile_Cap_01",
+            length=pile_cap_len,
+            width=pile_cap_w,
+            depth=pile_cap_depth,
+            center_x=sub_x,
+            center_y=sub_y,
+            top_z=z_pile_cap_top
+        ))
+
+        # 4. Piles (4 circular piles in 2x2 grid)
+        pile_dia = 400.0
+        pile_len = 5000.0
+        pile_spacing = 600.0
+        z_piles_top = z_pile_cap_top - pile_cap_depth
+
+        half_s = pile_spacing / 2.0
+        pile_coords = [
+            (sub_x - half_s, sub_y - half_s),
+            (sub_x + half_s, sub_y - half_s),
+            (sub_x - half_s, sub_y + half_s),
+            (sub_x + half_s, sub_y + half_s),
+        ]
+
+        for idx, (px, py) in enumerate(pile_coords, 1):
+            items.append(ExtractedObject(
+                "SubstructurePile",
+                ifc_name=f"Pile_{idx:02d}",
+                diameter=pile_dia,
+                length=pile_len,
+                center_x=px,
+                center_y=py,
+                top_z=z_piles_top
+            ))
+
+        # 5. Reinforcement Elements
+        # Pier Column Reinforcement
+        cage_r = (pier_dia / 2.0) - 40.0 - 4.0 - 8.0
+        n_bars = 16
+        for b_idx in range(n_bars):
+            ang = b_idx * (2.0 * math.pi / n_bars)
+            bx = sub_x + cage_r * math.cos(ang)
+            by = sub_y + cage_r * math.sin(ang)
+            items.append(ExtractedObject(
+                "SubstructureRebar",
+                ifc_name=f"Pier_Rebar_Main_{b_idx+1:02d}",
+                bar_type="MAIN",
+                diameter=16.0,
+                p1=(bx, by, z_pier_top - pier_h + 40.0),
+                p2=(bx, by, z_pier_top - 40.0)
+            ))
+
+        # Pile Reinforcement (for each pile)
+        p_cage_r = (pile_dia / 2.0) - 40.0 - 4.0 - 8.0
+        for p_idx, (px, py) in enumerate(pile_coords, 1):
+            for pb_idx in range(8):
+                ang = pb_idx * (2.0 * math.pi / 8)
+                bx = px + p_cage_r * math.cos(ang)
+                by = py + p_cage_r * math.sin(ang)
+                items.append(ExtractedObject(
+                    "SubstructureRebar",
+                    ifc_name=f"Pile_{p_idx}_Rebar_Main_{pb_idx+1:02d}",
+                    bar_type="MAIN",
+                    diameter=16.0,
+                    p1=(bx, by, z_piles_top - pile_len + 40.0),
+                    p2=(bx, by, z_piles_top - 40.0)
+                ))
+
+        return items
 
     def _solve_girder_layout(self, total_width):
         """

@@ -245,6 +245,9 @@ def ensure_osdag_core_db():
         conn.close()
         print("[INFO] osdag_core Intg_osdag sqlite database built from SQL")
 
+    except ModuleNotFoundError:
+        # osdag_core is optional; the bridge uses built-in is800_common_compat
+        pass
     except Exception as e:
         print(f"[ERROR] osdag_core database setup failed: {e}")
 

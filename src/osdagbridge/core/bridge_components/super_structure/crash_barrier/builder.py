@@ -5,19 +5,22 @@
 - Contains footpath-based positioning logic
 """
 from osdagbridge.core.utils.common import *
-from OCC.Core.gp import gp_Pnt, gp_Vec, gp_Trsf, gp_Dir, gp_Ax2, gp_Ax1,gp_Pnt2d, gp_Ax2d, gp_Dir2d
-from OCC.Core.BRepBuilderAPI import (
-    BRepBuilderAPI_MakePolygon,
-    BRepBuilderAPI_MakeFace,
-    BRepBuilderAPI_Transform,
-    BRepBuilderAPI_MakeWire,
-    BRepBuilderAPI_MakeEdge
-)
-from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakePrism
-from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
-from OCC.Core.GCE2d import GCE2d_MakeArcOfCircle
-from OCC.Core.Geom import Geom_Plane
-from OCC.Core.gp import gp_Pln
+try:
+    from OCC.Core.gp import gp_Pnt, gp_Vec, gp_Trsf, gp_Dir, gp_Ax2, gp_Ax1,gp_Pnt2d, gp_Ax2d, gp_Dir2d
+    from OCC.Core.BRepBuilderAPI import (
+        BRepBuilderAPI_MakePolygon,
+        BRepBuilderAPI_MakeFace,
+        BRepBuilderAPI_Transform,
+        BRepBuilderAPI_MakeWire,
+        BRepBuilderAPI_MakeEdge
+    )
+    from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakePrism
+    from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
+    from OCC.Core.GCE2d import GCE2d_MakeArcOfCircle
+    from OCC.Core.Geom import Geom_Plane
+    from OCC.Core.gp import gp_Pln
+except ImportError:
+    pass
 import numpy as np
 import math
 

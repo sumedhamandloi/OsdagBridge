@@ -467,6 +467,82 @@ class CAD3DWindow(QWidget):
             BARRIER_COLOR
         )
 
+        # SUBSTRUCTURE & REINFORCEMENT (Concrete semi-transparent 0.35, Rebar opaque metallic)
+        SUB_CONCRETE_COLOR = Quantity_Color(176/255.0, 196/255.0, 222/255.0, Quantity_TOC_RGB)
+        REBAR_COLOR = Quantity_Color(180/255.0, 70/255.0, 40/255.0, Quantity_TOC_RGB)
+
+        display_and_register(
+            cad_data.get("pier_cap", []),
+            "Pier Cap",
+            "Pier Cap (Hammerhead)\nTop Width: 3000 mm\nBottom Width: 1200 mm\nDepth: 600 mm",
+            SUB_CONCRETE_COLOR,
+            transparency=0.35
+        )
+
+        display_and_register(
+            cad_data.get("pier_cap_rebar", []),
+            "Pier Cap Rebar",
+            "Pier Cap Rebar\nCover: 40 mm\nMain Dia: 16 mm\nTies Dia: 8 mm",
+            REBAR_COLOR,
+            selectable=False
+        )
+
+        display_and_register(
+            cad_data.get("pier", []),
+            "Pier",
+            "Pier Column\nDiameter: 800 mm\nHeight: 3000 mm",
+            SUB_CONCRETE_COLOR,
+            transparency=0.35
+        )
+
+        display_and_register(
+            cad_data.get("pier_rebar", []),
+            "Pier Rebar",
+            "Pier Rebar Cage\nCover: 40 mm\nMain Dia: 16 mm\nTies: 8 mm @ 200 mm",
+            REBAR_COLOR,
+            selectable=False
+        )
+
+        display_and_register(
+            cad_data.get("pile_cap", []),
+            "Pile Cap",
+            "Pile Cap\nLength: 2200 mm\nWidth: 1200 mm\nDepth: 600 mm",
+            SUB_CONCRETE_COLOR,
+            transparency=0.35
+        )
+
+        display_and_register(
+            cad_data.get("pile_cap_rebar", []),
+            "Pile Cap Rebar",
+            "Pile Cap Rebar Mats\nTop & Bottom Rebars: 16 mm @ 150 mm",
+            REBAR_COLOR,
+            selectable=False
+        )
+
+        display_and_register(
+            cad_data.get("piles", []),
+            "Piles",
+            "Piles (2x2 Grid)\nDiameter: 400 mm\nLength: 5000 mm\nSpacing: 600 mm",
+            SUB_CONCRETE_COLOR,
+            transparency=0.35
+        )
+
+        display_and_register(
+            cad_data.get("piles_rebar", []),
+            "Piles Rebar",
+            "Piles Rebar Cages\nMain: 16 mm\nTies: 8 mm @ 200 mm",
+            REBAR_COLOR,
+            selectable=False
+        )
+
+        display_and_register(
+            cad_data.get("substructure_rebar", []),
+            "Reinforcement",
+            "Substructure Reinforcement\nMain: 16 mm\nTransverse: 8 mm\nCover: 40 mm",
+            REBAR_COLOR,
+            selectable=False
+        )
+
         # Nodes and grillage overlays
         node_positions = self._render_nodes()
         self._render_grillage(node_positions)
@@ -716,6 +792,11 @@ class CAD3DWindow(QWidget):
             "Crash Barrier": ["Crash Barrier", "Crash Barrier W-Beam"],
             "Median":        ["Median", "Median W-Beam"],
             "Railing":       ["Railing"],
+            "Pier Cap":      ["Pier Cap", "Pier Cap Rebar"],
+            "Pier":          ["Pier", "Pier Rebar"],
+            "Pile Cap":      ["Pile Cap", "Pile Cap Rebar"],
+            "Piles":         ["Piles", "Piles Rebar"],
+            "Reinforcement": ["Pier Cap Rebar", "Pier Rebar", "Pile Cap Rebar", "Piles Rebar", "Reinforcement"],
             "Grillage":      ["Grillage"],
             "Node":          ["Node"],
         }
@@ -1209,6 +1290,11 @@ class BridgeComponentCheckbox(QWidget):
         ("Crash Barrier", "Crash Barrier"),
         ("Median",        "Median"),
         ("Railing",       "Railing"),
+        ("Pier Cap",      "Pier Cap"),
+        ("Pier",          "Pier"),
+        ("Pile Cap",      "Pile Cap"),
+        ("Piles",         "Piles"),
+        ("Reinforcement", "Reinforcement"),
         ("Grillage view", "Grillage"),
         ("Node",          "Node"),
         ("Node Numbers",  "NodeNumbers"),

@@ -8,3 +8,9 @@ pydantic
 xarray
 ifcopenshell
 openpyxl
+pyyaml
+navcube
+mplcursors
+plotly
+ipython
+vfo

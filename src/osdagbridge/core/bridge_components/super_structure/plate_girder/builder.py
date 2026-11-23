@@ -11,15 +11,18 @@ import math
 import numpy as np
 from dataclasses import dataclass
 
-from OCC.Core.gp import gp_Pnt, gp_Vec, gp_Trsf, gp_Ax3, gp_Dir, gp_Ax2
-from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakePrism, BRepPrimAPI_MakeCylinder
-from OCC.Core.BRepBuilderAPI import (
-    BRepBuilderAPI_MakeEdge,
-    BRepBuilderAPI_MakeWire,
-    BRepBuilderAPI_MakeFace,
-    BRepBuilderAPI_Transform
-)
-from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
+try:
+    from OCC.Core.gp import gp_Pnt, gp_Vec, gp_Trsf, gp_Ax3, gp_Dir, gp_Ax2, gp_Ax1
+    from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakePrism, BRepPrimAPI_MakeCylinder
+    from OCC.Core.BRepBuilderAPI import (
+        BRepBuilderAPI_MakeEdge,
+        BRepBuilderAPI_MakeWire,
+        BRepBuilderAPI_MakeFace,
+        BRepBuilderAPI_Transform
+    )
+    from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
+except ImportError:
+    pass
 
 @dataclass
 class GirderSegment:
@@ -77,8 +80,11 @@ def _make_plate(origin, length, width, thickness, u_dir, w_dir):
     return BRepPrimAPI_MakePrism(face, extrude_vec).Shape()
 
 
-from OCC.Core.gp import gp_Ax1, gp_Dir
-from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_Transform
+try:
+    from OCC.Core.gp import gp_Ax1, gp_Dir
+    from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_Transform
+except ImportError:
+    pass
 
 def _rotate_about_z(shape, angle_deg):
     trsf = gp_Trsf()

@@ -7,14 +7,17 @@ Supports three types per IRC 5:2015:
   - Metallic Crash Barrier (Fig 5c)
 """
 from osdagbridge.core.utils.common import *
-from OCC.Core.gp import gp_Trsf, gp_Vec, gp_Pnt, gp_Dir, gp_Ax2, gp_Ax1
-from OCC.Core.BRepBuilderAPI import (
-    BRepBuilderAPI_Transform,
-    BRepBuilderAPI_MakePolygon,
-    BRepBuilderAPI_MakeFace
-)
-from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox, BRepPrimAPI_MakePrism
-from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
+try:
+    from OCC.Core.gp import gp_Trsf, gp_Vec, gp_Pnt, gp_Dir, gp_Ax2, gp_Ax1
+    from OCC.Core.BRepBuilderAPI import (
+        BRepBuilderAPI_Transform,
+        BRepBuilderAPI_MakePolygon,
+        BRepBuilderAPI_MakeFace
+    )
+    from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox, BRepPrimAPI_MakePrism
+    from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
+except ImportError:
+    pass
 import math
 import numpy as np
 

@@ -47,6 +47,18 @@ from osdagbridge.core.bridge_components.super_structure.median.builder import (
 from osdagbridge.core.bridge_components.super_structure.cross_bracing.builder import (
     build_cross_bracings
 )
+from osdagbridge.core.bridge_components.sub_structure.pier_cap.builder import (
+    build_pier_cap
+)
+from osdagbridge.core.bridge_components.sub_structure.pier.builder import (
+    build_pier
+)
+from osdagbridge.core.bridge_components.foundation.pile_cap.builder import (
+    build_pile_cap
+)
+from osdagbridge.core.bridge_components.foundation.pile.builder import (
+    build_piles
+)
 
 from osdagbridge.core.bridge_types.plate_girder.dto import (
     BridgeParametersDTO,
@@ -908,6 +920,53 @@ class PlateGirderCADGenerator:
         
         supports = supports_tri + supports_cyl
 
+        # STEP 12: BUILD SUBSTRUCTURE & REINFORCEMENT
+        z_contact = -self.girder_section_d / 2.0 - self.girder_section_tf_b
+        sub_x = 0.0
+        sub_y = 0.0
+
+        pier_cap_res = build_pier_cap(
+            top_width=getattr(design_params, "pier_cap_top_width", 3000.0),
+            bottom_width=1200.0,
+            depth=600.0,
+            length=getattr(design_params, "pier_cap_length", 1200.0),
+            center_x=sub_x,
+            center_y=sub_y,
+            top_z=z_contact
+        )
+
+        z_pier_top = z_contact - 600.0
+        pier_res = build_pier(
+            diameter=800.0,
+            height=3000.0,
+            center_x=sub_x,
+            center_y=sub_y,
+            top_z=z_pier_top
+        )
+
+        z_pile_cap_top = z_pier_top - 3000.0
+        pile_cap_res = build_pile_cap(
+            length=2200.0,
+            width=1200.0,
+            depth=600.0,
+            center_x=sub_x,
+            center_y=sub_y,
+            top_z=z_pile_cap_top
+        )
+
+        z_piles_top = z_pile_cap_top - 600.0
+        piles_res = build_piles(
+            n_piles_per_cap=4,
+            pile_diameter=400.0,
+            pile_length=5000.0,
+            pile_spacing=600.0,
+            center_x=sub_x,
+            center_y=sub_y,
+            top_z=z_piles_top
+        )
+
+        sub_rebar_list = [s for s in [pier_cap_res["rebar_compound"], pier_res["rebar_compound"], pile_cap_res["rebar_compound"], piles_res["rebar_compound"]] if s is not None]
+
         # RETURN ALL GENERATED COMPONENTS
         
         return {
@@ -956,7 +1015,25 @@ class PlateGirderCADGenerator:
             "median_w_beams": median_w_beams,
             
             # Railings
-            "railings": railings
+            "railings": railings,
+
+            # Substructure components
+            "pier_cap": [pier_cap_res["concrete"]],
+            "pier_cap_rebar": [pier_cap_res["rebar_compound"]] if pier_cap_res["rebar_compound"] else [],
+            "pier": [pier_res["concrete"]],
+            "pier_rebar": [pier_res["rebar_compound"]] if pier_res["rebar_compound"] else [],
+            "pile_cap": [pile_cap_res["concrete"]],
+            "pile_cap_rebar": [pile_cap_res["rebar_compound"]] if pile_cap_res["rebar_compound"] else [],
+            "piles": [piles_res["concrete_compound"]],
+            "piles_rebar": [piles_res["rebar_compound"]] if piles_res["rebar_compound"] else [],
+            "substructure_concrete": [pier_cap_res["concrete"], pier_res["concrete"], pile_cap_res["concrete"], piles_res["concrete_compound"]],
+            "substructure_rebar": sub_rebar_list,
+            "substructure_metadata": {
+                "pier_cap": pier_cap_res["parameters"],
+                "pier": pier_res["parameters"],
+                "pile_cap": pile_cap_res["parameters"],
+                "piles": piles_res["parameters"]
+            }
         }
 
     def create3Dcad(self):

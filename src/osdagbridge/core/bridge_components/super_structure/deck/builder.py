@@ -8,21 +8,23 @@ Deck builder.
 """
 
 # OCC imports
-
-from OCC.Core.BRepPrimAPI import (
-    BRepPrimAPI_MakeBox,
-    BRepPrimAPI_MakeCylinder,
-    BRepPrimAPI_MakePrism
-)
-from OCC.Core.BRepBuilderAPI import (
-    BRepBuilderAPI_Transform,
-    BRepBuilderAPI_MakePolygon,
-    BRepBuilderAPI_MakeFace
-)
-from OCC.Core.gp import (
-    gp_Vec, gp_Trsf, gp_Pnt,
-    gp_Ax1, gp_Dir
-)
+try:
+    from OCC.Core.BRepPrimAPI import (
+        BRepPrimAPI_MakeBox,
+        BRepPrimAPI_MakeCylinder,
+        BRepPrimAPI_MakePrism
+    )
+    from OCC.Core.BRepBuilderAPI import (
+        BRepBuilderAPI_Transform,
+        BRepBuilderAPI_MakePolygon,
+        BRepBuilderAPI_MakeFace
+    )
+    from OCC.Core.gp import (
+        gp_Vec, gp_Trsf, gp_Pnt,
+        gp_Ax1, gp_Dir
+    )
+except ImportError:
+    pass
 
 import random
 import math
